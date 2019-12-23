@@ -1,0 +1,48 @@
+name: release-2.163.1-ubuntu18.04
+
+on:
+  push:
+    branches:
+    - master
+    - '**'
+
+env: 
+  GH_REGISTRY: docker.pkg.github.com
+  DOCKER_IMAGE_NAME: github-runner
+  DOCKER_IMAGE_VERSION: 2.163.1-ubuntu18.04
+  DOCKERHUB_REPOSITORY: swaglive
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set env
+      run: |
+        echo "::set-env name=DOCKER_IMAGE_CACHE::$GH_REGISTRY/$GITHUB_REPOSITORY/$DOCKER_IMAGE_NAME:latest"
+    - name: Docker Login - docker.com
+      env: 
+        DOCKER_USERNAME: ${{ secrets.DH_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DH_PASSWORD }}
+      run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin docker.pkg.github.com
+    - name: Docker Login - docker.pkg.github.com
+      env: 
+        DOCKER_USERNAME: ${{ secrets.GHR_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.GHR_PASSWORD }}
+      run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin docker.pkg.github.com
+      
+    - name: Docker - get cache
+      run: docker pull $DOCKER_IMAGE_CACHE || true
+    - name: Docker - build
+      run: |
+        docker build \
+          --cache-from $DOCKER_IMAGE_CACHE \
+          -t $DOCKER_IMAGE_CACHE \
+          -t $GH_REGISTRY/$GITHUB_REPOSITORY/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_VERSION \
+          -t $DOCKERHUB_REPOSITORY/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_VERSION \
+          $DOCKER_IMAGE_VERSION
+    - name: Docker - push
+      run: |
+        docker push $DOCKER_IMAGE_CACHE
+        docker push $GH_REGISTRY/$GITHUB_REPOSITORY/$DOCKER_IMAGE_NAME:DOCKER_IMAGE_VERSION
+        docker push $DOCKERHUB_REPOSITORY/$DOCKER_IMAGE_NAME:DOCKER_IMAGE_VERSION
