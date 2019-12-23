@@ -24,7 +24,7 @@ jobs:
       env: 
         DOCKER_USERNAME: ${{ secrets.DH_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DH_PASSWORD }}
-      run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin docker.pkg.github.com
+      run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
     - name: Docker Login - docker.pkg.github.com
       env: 
         DOCKER_USERNAME: ${{ secrets.GHR_USERNAME }}
