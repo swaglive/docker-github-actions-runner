@@ -1,6 +1,6 @@
 #!/bin/bash
-test $WORK_DIR || WORK_DIR='_work'
-test $AGENT || AGENT=$(hostname)
+NAME=${NAME:-$(hostname)}
+WORK_DIR=${WORK_DIR:-_work}
 
 if [[ -e "/var/run/docker.sock" ]]; then
     sudo chgrp runner /var/run/docker.sock
@@ -16,5 +16,5 @@ if [ ! $TOKEN ]; then
     exit 1
 fi
 
-echo -ne 'Y\n\n' | ./config.sh --url $URL --token $TOKEN --name $AGENT --work $WORK_DIR 
+echo -ne 'Y\n\n' | ./config.sh --url $URL --token $TOKEN --name $NAME --work $WORK_DIR
 ./run.sh
