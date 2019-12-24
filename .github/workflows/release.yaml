@@ -4,7 +4,6 @@ on:
   push:
     branches:
     - master
-    - '**'
 
 env: 
   GH_REGISTRY: docker.pkg.github.com
