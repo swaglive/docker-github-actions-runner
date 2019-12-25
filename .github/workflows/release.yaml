@@ -43,7 +43,7 @@ jobs:
           $DOCKER_IMAGE_VERSION
     - name: Docker - push
       run: |
-        parallel docker pull ::: \
+        parallel docker push ::: \
           $DOCKER_IMAGE_CACHE \
           $GH_REGISTRY/$GITHUB_REPOSITORY/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_VERSION \
           $DOCKERHUB_REPOSITORY/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_VERSION
