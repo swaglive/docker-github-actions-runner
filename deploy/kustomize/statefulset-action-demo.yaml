@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: github-runner-action-demo
+spec:
+  serviceName: github-runner-action-demo
+  replicas: 2
+  selector:
+    matchLabels:
+      app: github-runner-action-demo
+  template:
+    metadata:
+      labels:
+        app: github-runner-action-demo
+    spec:
+      containers:
+      - name: agent
+        image: swaglive/github-runner:2.163.1-ubuntu18.04
+        imagePullPolicy: Always
+        env: 
+          - name: DOCKER_TLS_VERIFY
+            value: "1"
+          - name: DOCKER_CERT_PATH
+            value: /certs/client
+        envFrom:
+        - secretRef:
+            name: github-runner-demo
+        resources:
+          requests:
+            cpu: 2
+            memory: 8Gi
+          limits:
+            cpu: 8
+            memory: 8Gi
+        volumeMounts: 
+          - name: runner-workdir
+            mountPath: /home/runner/_work
+          - name: docker-cert-client
+            mountPath: /certs/client
+
+      - name: dind-daemon 
+        image: docker:19.03-dind 
+        resources: 
+          requests: 
+              cpu: 20m 
+              memory: 1Gi 
+          limits:
+            cpu: 500m
+            memory: 1Gi
+        securityContext: 
+          privileged: true 
+        volumeMounts: 
+          - name: runner-workdir
+            mountPath: /home/runner/_work
+          - name: docker-cert-client
+            mountPath: /certs/client
+      volumes: 
+        - name: runner-workdir
+          emptyDir: {}
+        - name: docker-cert-client
+          emptyDir: {}
