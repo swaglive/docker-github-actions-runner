@@ -2,7 +2,7 @@
 NAME=${NAME:-$(hostname)}
 WORK_DIR=${WORK_DIR:-_work}
 
-if [[ -e "/var/run/docker.sock" ]]; then
+if [ -e "/var/run/docker.sock" ]; then
     sudo chgrp runner /var/run/docker.sock
 fi
 
@@ -16,5 +16,8 @@ if [ ! $TOKEN ]; then
     exit 1
 fi
 
-echo -ne 'Y\n\n' | ./config.sh --url $URL --token $TOKEN --name $NAME --work $WORK_DIR
+[ -d _token ] && cp -R _token/. .
+[ ! -f .credentials ] && echo -ne 'Y\n\n' | ./config.sh --url $URL --token $TOKEN --name $NAME --work $WORK_DIR
+[ -d _token ] && cp .env .path .runner .credentials* _token
+
 ./run.sh
