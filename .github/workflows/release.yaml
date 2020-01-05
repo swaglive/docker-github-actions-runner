@@ -1,0 +1,56 @@
+name: release-2.163.1-ubuntu18.04
+
+on:
+  push:
+    branches:
+    - master
+    tags:
+    - '**'
+    
+env: 
+  GH_REGISTRY: docker.pkg.github.com
+  DOCKER_IMAGE_NAME: github-runner
+  DOCKERHUB_REPOSITORY: swaglive
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set env
+      run: |
+        echo ::set-env name=DOCKER_IMAGE_VERSION::${GITHUB_REF##*/}
+        sudo apt-get install parallel
+
+    - name: Set env - replace master branch by latest
+      if: contains(github.ref, 'master')
+      run: |
+        echo ::set-env name=DOCKER_IMAGE_VERSION::latest
+        
+    - name: Docker - build
+      run: |
+        docker build \
+          -t $GH_REGISTRY/$GITHUB_REPOSITORY/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_VERSION \
+          -t $DOCKERHUB_REPOSITORY/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_VERSION \
+          .
+
+    - name: Docker Login - docker.com
+      if: contains(github.ref, 'tags')
+      env: 
+        DOCKER_USERNAME: ${{ secrets.DH_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DH_PASSWORD }}
+      run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+
+    - name: Docker Login - docker.pkg.github.com
+      if: contains(github.ref, 'tags')
+      env: 
+        DOCKER_USERNAME: ${{ secrets.GHR_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.GHR_PASSWORD }}
+      run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin docker.pkg.github.com
+      
+    - name: Docker - push
+      if: contains(github.ref, 'tags')
+      run: |
+        parallel docker push ::: \
+          $GH_REGISTRY/$GITHUB_REPOSITORY/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_VERSION \
+          $DOCKERHUB_REPOSITORY/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_VERSION

@@ -24,3 +24,9 @@ docker run -it --rm \
     -v $PWD/_token:/home/runner/_token \
     --name runner swaglive/github-runner
 ```
+
+## Reference
+- https://github.com/actions/runner
+- https://serverfault.com/questions/819369/mounting-a-volume-with-docker-in-docker
+=======
+
