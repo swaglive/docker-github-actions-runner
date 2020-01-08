@@ -17,7 +17,7 @@ if [ ! $TOKEN ]; then
 fi
 
 [ -d _token ] && cp -R _token/. .
-[ ! -f .credentials ] && echo -ne 'Y\n\n' | ./config.sh --url $URL --token $TOKEN --name $NAME --work $WORK_DIR
+[ ! -f .credentials ] && ./config.sh --url $URL --token $TOKEN --name $NAME --work $WORK_DIR --replace
 [ -d _token ] && cp .env .path .runner .credentials* _token
 
 ./run.sh
