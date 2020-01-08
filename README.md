@@ -1,4 +1,7 @@
 # docker-github-actions-runner
+- latest [![](https://github.com/swaglive/docker-github-actions-runner/workflows/release-2.163.1-ubuntu18.04/badge.svg)](https://github.com/swaglive/docker-github-actions-runner/tree/master)
+- 2.163.1-ubuntu18.04 [![](https://github.com/swaglive/docker-github-actions-runner/workflows/release-2.163.1-ubuntu18.04/badge.svg?tag=2.163.1-ubuntu18.04)](https://github.com/swaglive/docker-github-actions-runner/tree/2.163.1-ubuntu18.04)
+
 Find `URL` and `TOKEN` in repository Settings -> Actions -> Add runner.
 
 ## Example
