@@ -1,5 +1,5 @@
 # docker-github-actions-runner
-Dockerize self-hosted github runner
+Find `URL` and `TOKEN` in repository Settings -> Actions -> Add runner.
 
 ## Example
 ```
@@ -13,7 +13,7 @@ docker run -it --rm \
 ```
 
 
-## Debug
+## Debug with swaglive/github-runner
 ```
 docker run -it --rm \
     -e URL=https://github.com/swaglive/docker-github-actions-runner \
@@ -23,10 +23,10 @@ docker run -it --rm \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v $PWD/_token:/home/runner/_token \
     --name runner swaglive/github-runner
+
+runner@a42e26ab99b5:~$ /entrypoint.sh 
 ```
 
 ## Reference
 - https://github.com/actions/runner
 - https://serverfault.com/questions/819369/mounting-a-volume-with-docker-in-docker
-=======
-
