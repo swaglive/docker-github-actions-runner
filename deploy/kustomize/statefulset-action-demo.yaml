@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: github-runner-action-demo
+spec:
+  serviceName: github-runner-action-demo
+  replicas: 2
+  selector:
+    matchLabels:
+      app: github-runner-action-demo
+  volumeClaimTemplates:
+  - metadata:
+      name: token
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: hdd
+      resources:
+        requests:
+          storage: 1Gi
+  template:
+    metadata:
+      labels:
+        app: github-runner-action-demo
+    spec:
+      securityContext:
+        fsGroup: 1000 # github-runner need to access _token folder
+      containers:
+      - name: agent
+        image: swaglive/github-runner:2.163.1-ubuntu18.04
+        env: 
+          - name: DOCKER_TLS_VERIFY
+            value: "1"
+          - name: DOCKER_CERT_PATH
+            value: /certs/client
+        envFrom:
+        - secretRef:
+            name: github-runner-action-demo
+        resources:
+          requests:
+            cpu: 1
+            memory: 2Gi
+          limits:
+            cpu: 8
+            memory: 2Gi
+        volumeMounts: 
+          - name: runner-workdir
+            mountPath: /home/runner/_work
+          - name: docker-cert-client
+            mountPath: /certs/client
+          - name: token
+            mountPath: /home/runner/_token
+
+      - name: dind-daemon 
+        image: docker:19.03-dind 
+        resources: 
+          requests: 
+              cpu: 20m 
+              memory: 1Gi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+        securityContext: 
+          privileged: true 
+        volumeMounts: 
+          - name: runner-workdir
+            mountPath: /home/runner/_work
+          - name: docker-cert-client
+            mountPath: /certs/client
+      volumes: 
+        - name: runner-workdir
+          emptyDir: {}
+        - name: docker-cert-client
+          emptyDir: {}

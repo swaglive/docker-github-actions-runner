@@ -1,0 +1,5 @@
+namespace: ops
+
+resources:
+  - secrets.yaml
+  - statefulset-action-demo.yaml
